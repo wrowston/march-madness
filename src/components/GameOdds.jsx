@@ -4,10 +4,6 @@ import { Team } from './Team'
 import mockGameOdds from '../mockGameOdds.json'
 import { Table } from 'antd';
 
-
-let API_KEY = 'b2b4c237dbec4319e025ca56c1fe688e'
-
-
 export const GameOdds = () => {
     let [gameOdds, setGameOdds] = useState([]);
     let [teamOdds, setTeamOdds] = useState([]);
