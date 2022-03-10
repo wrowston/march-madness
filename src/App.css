@@ -36,3 +36,17 @@
     transform: rotate(360deg);
   }
 }
+
+
+.team-wrapper {
+  display: flex;
+  align-content: space-around;
+  flex-wrap: wrap;
+  
+}
+
+/* .market-wrapper {
+  display: flex;
+  align-content: space-around;
+  flex-wrap: wrap;
+} */
