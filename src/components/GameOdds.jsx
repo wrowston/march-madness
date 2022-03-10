@@ -95,36 +95,48 @@ export const GameOdds = () => {
         getGameOdds()
         let teams = []
         gameOdds.forEach(game => {
-            let team = {
-                id: game.id,
-                name: '',
-                bookmaker: '',
-                spread: '',
-                spreadPrice: '',
-                moneyLine: '',
-                total: '',
-                overPrice: '',
-                underPrice: ''
-            }
             game.bookmakers.map(book => {
+                let team = {
+                    id: game.id,
+                    favorite: '',
+                    underdog: '',
+                    bookmaker: '',
+                    spread: '',
+                    favSpreadPrice: '',
+                    underdogSpreadPrice: '',
+                    underdogMoneyLine: '',
+                    favMoneyLine: '',
+                    total: '',
+                    overPrice: '',
+                    underPrice: ''
+                }
+
+
                 team.bookmaker = book.title
                 book.markets.map(market => {
                     if (market.key === 'h2h') {
                         market.outcomes.map(outcome => {
-                            team.name = outcome.name
-                            team.moneyLine = outcome.price
+                            if (outcome.price > 0) {
+                                team.underdog = outcome.name
+                                team.underdogMoneyLine = outcome.price
+                            } else if (outcome.price <= 0) {
+                                team.favorite = outcome.name
+                                team.favMoneyLine = outcome.price
+                            }
                         })
                     } else if (market.key === 'spreads') {
                         market.outcomes.map(outcome => {
-                            if (outcome.name === team.name) {
-                                team.spread = outcome.point
-                                team.spreadPrice = outcome.price
+                            team.spread = outcome.point
+                            if (outcome.name === team.underdog) {
+                                team.underdogSpreadPrice = outcome.price
+                            } else {
+                                team.favSpreadPrice = outcome.price
                             }
                         })
                     } else if (market.key === 'totals') {
                         market.outcomes.map(outcome => {
+                            team.total = outcome.point
                             if (outcome.name === 'Over') {
-                                team.total = outcome.point
                                 team.overPrice = outcome.price
                             } else if (outcome.name === 'Under') {
                                 team.underPrice = outcome.price
@@ -132,13 +144,12 @@ export const GameOdds = () => {
                         })
                     }
                 })
+                teams.push(team)
             })
-
-            teams.push(team)
         })
 
         setTeamOdds(teams)
-        console.log('teams: ' + teamOdds)
+        console.log('teams: ' + JSON.stringify(teams))
 
     }
 
