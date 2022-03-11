@@ -2,80 +2,11 @@ import React, { useState } from 'react'
 import Button from 'react-bootstrap/Button';
 import { Team } from './Team'
 import mockGameOdds from '../mockGameOdds.json'
-import { Table } from 'antd';
+import Table from 'react-bootstrap/Table'
 
 export const GameOdds = () => {
     let [gameOdds, setGameOdds] = useState([]);
     let [teamOdds, setTeamOdds] = useState([]);
-
-    const data = teamOdds
-    const columns = [
-        {
-            title: 'Team Name',
-            width: 100,
-            dataIndex: 'name',
-            key: 'name',
-            fixed: 'left',
-        },
-        {
-            title: 'Age',
-            width: 100,
-            dataIndex: 'age',
-            key: 'age',
-            fixed: 'left',
-        },
-        {
-            title: 'Column 1',
-            dataIndex: 'address',
-            key: '1',
-            width: 150,
-        },
-        {
-            title: 'Column 2',
-            dataIndex: 'address',
-            key: '2',
-            width: 150,
-        },
-        {
-            title: 'Column 3',
-            dataIndex: 'address',
-            key: '3',
-            width: 150,
-        },
-        {
-            title: 'Column 4',
-            dataIndex: 'address',
-            key: '4',
-            width: 150,
-        },
-        {
-            title: 'Column 5',
-            dataIndex: 'address',
-            key: '5',
-            width: 150,
-        },
-        {
-            title: 'Column 6',
-            dataIndex: 'address',
-            key: '6',
-            width: 150,
-        },
-        {
-            title: 'Column 7',
-            dataIndex: 'address',
-            key: '7',
-            width: 150,
-        },
-        { title: 'Column 8', dataIndex: 'address', key: '8' },
-        {
-            title: 'Action',
-            key: 'operation',
-            fixed: 'right',
-            width: 100,
-            render: () => <a>action</a>,
-        },
-    ];
-
 
     const getGameOdds = async () => {
         // let url = `https://api.the-odds-api.com/v4/sports/basketball_ncaab/odds/?apiKey=${API_KEY}&regions=us&markets=h2h,spreads,totals&oddsFormat=american`
@@ -101,62 +32,80 @@ export const GameOdds = () => {
                     favorite: '',
                     underdog: '',
                     bookmaker: '',
-                    spread: '',
+                    favSpread: '',
                     favSpreadPrice: '',
+                    underdogSpread: '',
                     underdogSpreadPrice: '',
                     underdogMoneyLine: '',
                     favMoneyLine: '',
                     total: '',
                     overPrice: '',
-                    underPrice: ''
+                    underPrice: '',
+                    rowBotPick: ''
                 }
 
-
-                team.bookmaker = book.title
-                book.markets.map(market => {
-                    if (market.key === 'h2h') {
-                        market.outcomes.map(outcome => {
-                            if (outcome.price > 0) {
-                                team.underdog = outcome.name
-                                team.underdogMoneyLine = outcome.price
-                            } else if (outcome.price <= 0) {
-                                team.favorite = outcome.name
-                                team.favMoneyLine = outcome.price
-                            }
-                        })
-                    } else if (market.key === 'spreads') {
-                        market.outcomes.map(outcome => {
-                            team.spread = outcome.point
-                            if (outcome.name === team.underdog) {
-                                team.underdogSpreadPrice = outcome.price
-                            } else {
-                                team.favSpreadPrice = outcome.price
-                            }
-                        })
-                    } else if (market.key === 'totals') {
-                        market.outcomes.map(outcome => {
-                            team.total = outcome.point
-                            if (outcome.name === 'Over') {
-                                team.overPrice = outcome.price
-                            } else if (outcome.name === 'Under') {
-                                team.underPrice = outcome.price
-                            }
-                        })
-                    }
-                })
+                if (book.title === 'FanDuel') {
+                    team.bookmaker = book.title
+                    book.markets.map(market => {
+                        if (market.key === 'h2h') {
+                            market.outcomes.map(outcome => {
+                                if (outcome.price > 0) {
+                                    team.underdog = outcome.name
+                                    team.underdogMoneyLine = outcome.price
+                                } else if (outcome.price <= 0) {
+                                    team.favorite = outcome.name
+                                    team.favMoneyLine = outcome.price
+                                }
+                            })
+                        } else if (market.key === 'spreads') {
+                            market.outcomes.map(outcome => {
+                                if (outcome.point > 0) {
+                                    team.underdog = outcome.name
+                                    team.underdogSpread = outcome.point
+                                    team.underdogSpreadPrice = outcome.price
+                                } else if (outcome.point < 0) {
+                                    team.favorite = outcome.name
+                                    team.favSpread = outcome.point
+                                    team.favSpreadPrice = outcome.price
+                                }
+                            })
+                        } else if (market.key === 'totals') {
+                            market.outcomes.map(outcome => {
+                                team.total = outcome.point
+                                if (outcome.name === 'Over') {
+                                    team.overPrice = outcome.price
+                                } else if (outcome.name === 'Under') {
+                                    team.underPrice = outcome.price
+                                }
+                            })
+                        }
+                    })
+                }
+                team.rowBotPick = rowBotRandomPick(team.favorite, team.underdog)
                 teams.push(team)
             })
         })
 
         setTeamOdds(teams)
-        console.log('teams: ' + JSON.stringify(teams))
+        console.log('teams: ' + JSON.stringify(teamOdds))
 
+    }
+
+    const rowBotRandomPick = (favorite, underdog) => {
+        let num = Math.floor(Math.random() * 2)
+        if (num === 0) {
+            return underdog
+        } else {
+            return favorite
+        }
     }
 
     return (
 
         <div>
             <Button onClick={translateGameOdds}>Translate GameOdds</Button>
+
+            <Team teams={teamOdds}/>
 
             {/* <Button onClick={getGameOdds}>Refresh GameOdds</Button>
             Game Odds:

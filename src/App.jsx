@@ -3,6 +3,7 @@ import './App.css';
 import React from 'react';
 import Home from './components/Home'
 import {Routes, Route, BrowserRouter as Router} from 'react-router-dom'
+import 'bootstrap/dist/css/bootstrap.css';
 
 
 
